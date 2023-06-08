@@ -36,7 +36,7 @@ const initlizePassport = () => {
     }))
 
     //le digo que el email va a ser el field username
-passport.use('login', new LocalStrategy({usernameField:'email'},async(email, password,done)=>{
+    passport.use('login', new LocalStrategy({usernameField:'email'},async(email, password,done)=>{
     //PASSPORT SOLO DEBE DEVOLVER EL USUARIO FINAL. NO ES RESPONSABLE DE LA SESION
     let user;
     if(email === "adminCoder@coder.com" && password==="adminCod3r123" ){
