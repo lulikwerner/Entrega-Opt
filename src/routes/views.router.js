@@ -86,4 +86,10 @@ router.get('/login', privacy('NO_AUTHENTICATED'), async(req,res)=>{
 router.get('/profile', privacy('PRIVATE'), (req,res) => {
   res.render('profile', {user:req.session.user})
 })
+
+//Vista con JWT
+router.get('/', (req,res) => {
+  res.render('jwtProfile')
+
+})
 export default router;

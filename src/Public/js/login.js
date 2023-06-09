@@ -5,7 +5,10 @@ form.addEventListener('submit', async(event)=>{
     const data = new FormData(form);
     const  obj ={};
     data.forEach((value,key)=>(obj[key] = value));
-    const response = await fetch('/api/sessions/login', {
+    //Esto es con sessions 
+    //const response = await fetch('/api/sessions/login', {
+        //Esto con JWT
+        const response = await fetch('/api/sessions/jwtLogin', {
         method:'POST',
         body:JSON.stringify(obj),
         headers:{
@@ -18,6 +21,9 @@ form.addEventListener('submit', async(event)=>{
     
     const responseData = JSON.parse(responseText);
     if(responseData.status === "success"){
+        //Lo guardo en mi local Storage cuando uso JWT
+        console.log(responseData.accessToken);
+        localStorage.setItem('accessToken', responseData.accessToken);
         Swal.fire({
             position: 'top-end',
             icon: 'success',
