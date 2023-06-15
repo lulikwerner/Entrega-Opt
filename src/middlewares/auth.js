@@ -13,3 +13,11 @@ export const privacy = (privacyType) =>{
         }
     };
 };
+
+export const authRoles = (role) => {
+    //Aca ya tengo un usuario
+    return async(req,res,next) => {
+        if(req.user.role!=role) return res.status(403).send({status:"error", error:"No tienes permisos para acceder aqui"});
+        next();
+    }
+}

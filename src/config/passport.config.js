@@ -3,12 +3,14 @@ import local from "passport-local";
 import GithubStrategy from "passport-github2";
 import userModel from "../dao/mongo/models/user.js";
 import { createHash, isValidPassword } from "../utils.js";
+import {Strategy, ExtractJwt} from 'passport-jwt';
+import {cookieExtractor } from '../utils.js';
 
 const LocalStrategy = local.Strategy; //Es la estrategia
 
 const initlizePassport = () => {
     //username y password son obligatorios extraerlos por eso te lo pide. Pongo el valor en true passReqToCallback: true para que me deje extraer la otra info del user y le digo que el email va a ser el username field usernameField:'email' 
-    passport.use('register',new LocalStrategy({passReqToCallback: true, usernameField:'email'}, async(req,email,password,done) => {
+passport.use('register',new LocalStrategy({passReqToCallback: true, usernameField:'email'}, async(req,email,password,done) => {
         try{
         //Aca extraigo todo lo que quiero que no sea username y password
         const { first_name, last_name } = req.body;
@@ -36,7 +38,7 @@ const initlizePassport = () => {
         }catch(error){
             done(error)
         }
-    }))
+}))
 
     //le digo que el email va a ser el field username
 passport.use('login', new LocalStrategy({usernameField:'email'},async(email, password,done)=>{
@@ -101,21 +103,15 @@ passport.use('github', new GithubStrategy({
     }
 }))
 
-//Lo transforma en un unico id para su tablita
-passport.serializeUser(function(user,done){
-    return done(null,user.id)
-});
-//Con esto rellena el user que trae 
-passport.deserializeUser(async function(id,done){
-    if(id===0){
-        return done(null,{
-            role:'admin',
-            name:'ADMIN'
-        })
-    }
-    const user = await userModel.findOne({_id:id});
-    return done(null,user);
-});
+//Passport  se encargara de la verificacion de mi TOKEN
+passport.use('jwt', new Strategy({
+  //Selecciono fromExtractor xq el token viene la cookie. Es para extraer el token de la cookie
+    jwtFromRequest:ExtractJwt.fromExtractors([cookieExtractor]),
+    secretOrKey: 'jwtsecret' //Tiene que coincidir con el que esta en utils.js  en const token
+}, async(payload,done)=>{
+  //En el payload viene el usuario que yo cree
+    return done(null, payload)
+}))
 
-}
+};
 export default initlizePassport;

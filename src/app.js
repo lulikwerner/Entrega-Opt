@@ -1,11 +1,9 @@
 import express from "express";
-import session from "express-session"
 import handlebars from "express-handlebars";
 import mongoose from "mongoose";
-import MongoStore from "connect-mongo"
 import { Server } from "socket.io";
 import { __dirname } from "./utils.js";
-import passport from "passport";
+import cookieParser from 'cookie-parser';
 
 
 import productRouter from "./routes/productsM.router.js";
@@ -24,7 +22,7 @@ const PORT = process.env.PORT || 8080;
 
 const startServer = async () => {
   //Conecta a mi mongoose db
-  try {
+ try {
     await mongoose.connect(
       "mongodb+srv://lulikwerner:123@clustercitofeliz.ro8b1xi.mongodb.net/ecommerce?retryWrites=true&w=majority"
     );
@@ -48,24 +46,17 @@ const startServer = async () => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(express.static(`${__dirname}/public`));
+  //Para firmar la cookie tengo que pasarle una clave
+  app.use(cookieParser("asdasdzxcasd"));
 
-  app.use(session({
-    store:new MongoStore({
-      mongoUrl: "mongodb+srv://lulikwerner:123@clustercitofeliz.ro8b1xi.mongodb.net/ecommerce?retryWrites=true&w=majority",
-      ttl:3600
-    }),
-    secret:"CoderS3cr3t",
-    resave:false,
-    saveUninitialized:false 
-  }))
 
   const ioMiddleware = (req, res, next) => {
     req.io = io;
     next();
   };
-  app.use(ioMiddleware);
+  app.use(ioMiddleware);  
 
-  app.use(passport.initialize());
+
   initlizePassport();
 
   //Son las rutas que uso
@@ -76,7 +67,6 @@ const startServer = async () => {
   //El chat 
   io.on("connection", async (socket) => {
     registerChatHandler(io, socket);
-
     console.log("Socket connected");
   });
 

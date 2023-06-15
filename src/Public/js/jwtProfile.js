@@ -1,4 +1,4 @@
-console.log('Before fetching jwtProfile');
+/*console.log('Before fetching jwtProfile');
 const jwt = localStorage.getItem('accessToken');
 console.log('jwt', jwt);
 
@@ -24,3 +24,4 @@ fetch('/api/sessions/jwtProfile', {
     welcome.innerHTML = `Hola, ${result.payload.name}`;
     email.innerHTML =`${result.payload.email}`;
   });
+*/

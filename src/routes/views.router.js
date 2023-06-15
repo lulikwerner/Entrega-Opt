@@ -4,6 +4,8 @@ import productManager from "../dao/mongo/managers/productManager.js"
 import cartManager from "../dao/mongo/managers/cartManager.js"
 import productModel from "../dao/mongo/models/products.js";
 import categoriesAndStatus from "../dao/mongo/managers/productManager.js"
+import {passportCall} from "../utils.js";
+import { authRoles } from "../middlewares/auth.js";
 
 const router = Router();
 const product = new  productManager ();
@@ -79,7 +81,7 @@ router.get('/register',privacy('NO_AUTHENTICATED'), async(req,res)=>{
   res.render('register');
 })
 
-router.get('/login', privacy('NO_AUTHENTICATED'), async(req,res)=>{
+router.get('/login', async(req,res)=>{
   res.render('login');
 })
 
@@ -87,9 +89,10 @@ router.get('/profile', privacy('PRIVATE'), (req,res) => {
   res.render('profile', {user:req.session.user})
 })
 
-//Vista con JWT
-router.get('/', (req,res) => {
-  res.render('jwtProfile')
-
+//El orden de los middlewares si altera el producto . passportCall tiene que ir primero que el authRoles
+//En el redirect lo mando a donde yo quiero 
+router.get('/',passportCall('jwt',{ redirect:'/login'}),authRoles('user') ,(req,res) => {
+  console.log(req.user)
+  res.render('jwtProfile', {user:req.user})
 })
 export default router;
